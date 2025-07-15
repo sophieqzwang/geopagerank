@@ -131,8 +131,11 @@ function loadLayer(column, geography) {
         onEachFeature: (feature, layer) => {
           const name = feature.properties[labelField] || "Unnamed";
           const val  = feature.properties[column];
-          const rankText = (val != null && !isNaN(val)) ? `Rank: ${val}` : "Rank: N/A";
+          const rankText = (val != null && !isNaN(val))
+            ? `Rank: ${val} / ${maxRank}`
+            : "Rank: N/A";
           layer.bindPopup(`<strong>${name}</strong><br>${rankText}`);
+
         }
 
 
