@@ -88,7 +88,7 @@ function loadLayer(column, geography) {
   if (geography === "county") {
     url        = "/geopagerank/" + FILES.county_irs;
     labelField = "NAMELSAD";
-    sourceName = "IRS county-level migration counts, 1991-2021";
+    sourceName = "IRS county-level migration counts, 1991-2022";
 
   /* ───────── 2. NEIGHBORHOOD (Data Axel) ───────── */
   } else if (geography === "neighborhood") {
@@ -106,7 +106,7 @@ function loadLayer(column, geography) {
     url         = "/geopagerank/" + (isIRS ? FILES.metro_irs
                                            : FILES.metro_acs);
     labelField  = "NAME";
-    sourceName  = isIRS ? "IRS migration counts, 1991-2021, aggregated to the metro level" : "ACS microdata, 2018-2023";
+    sourceName  = isIRS ? "IRS migration counts, 1991-2022, aggregated to the metro level" : "ACS microdata, 2018-2023";
   }
 
   /* ─── update the sidebar *before* loading the layer ─── */
