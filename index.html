@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Geographic Pageranks</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .hidden {
+      display: none;
+    }
+    #sidebar select,
+    #sidebar input[type="text"] {
+      width: 100%;
+      padding: 0.3rem 0.4rem;
+      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin: 0.25rem 0 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <div id="header">
+    <h1 class="title">Geographic Pagerank</h1>
+        <h2 class="subtitle">
+          <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5270927" target="_blank">From Alex Bell, Sophie Calder-Wang, and Shusheng Zhong (2025)</a>
+        </h2>
+  </div>
+
+  <div id="sidebar">
+    <!-- Geography selector -->
+    <h2>Geography</h2>
+    <label class="toggle-label"><input type="radio" name="geography" value="metro" /> <span>Metro</span></label><br />
+    <label class="toggle-label"><input type="radio" name="geography" value="county" checked /> <span>County</span></label><br />
+    <label class="toggle-label"><input type="radio" name="geography" value="neighborhood" /> <span>Neighborhood</span></label><br />   
+
+
+
+    <!-- Neighborhood level controls-->
+    <div id="neighborhood-options">
+      <h2>Choose city</h2>
+      <select id="city-select" name="city">
+        <option value="Chicago" selected>Chicago</option>
+        <option value="Boston">Boston</option>        
+      </select>
+    </div>
+
+
+    <!-- County-level controls -->
+    <div id="county-options">
+      <h2>Choose year</h2>
+      <select id="year-select" name="year">
+      <option value="2021" selected>2021</option>
+      <option value="2020">2020</option>
+      <option value="2019">2019</option>
+      <option value="2018">2018</option>
+      <option value="2017">2017</option>
+      <option value="2016">2016</option>
+      <option value="2015">2015</option>
+      <option value="2014">2014</option>
+      <option value="2013">2013</option>
+      <option value="2012">2012</option>
+      <option value="2011">2011</option>
+      <option value="2010">2010</option>
+      <option value="2009">2009</option>
+      <option value="2008">2008</option>
+      <option value="2007">2007</option>
+      <option value="2006">2006</option>
+      <option value="2005">2005</option>
+      <option value="2004">2004</option>
+      <option value="2003">2003</option>
+      <option value="2002">2002</option>
+      <option value="2001">2001</option>
+      <option value="2000">2000</option>
+      <option value="1999">1999</option>
+      <option value="1998">1998</option>
+      <option value="1997">1997</option>
+      <option value="1996">1996</option>
+      <option value="1995">1995</option>
+      <option value="1994">1994</option>
+      <option value="1993">1993</option>
+      <option value="1992">1992</option>
+      <option value="1991">1991</option>
+      <option value="1990">1990</option>
+      </select>
+    </div>
+
+    <!-- Metro-level controls -->
+    <div id="metro-options" class="hidden">
+      <h2>Choose sample</h2>
+      <label>Filter by
+        <select id="filter-type-select">
+          <option value="total" selected>All moves</option>
+          <option value="race">Race</option>
+          <option value="age">Age Group</option>
+          <option value="education">Education</option>
+          <option value="industry">Industry (1-digit NAICS)</option>
+          <option value="year">Year</option>
+        </select>
+      </label>
+
+      <!-- race selector -->
+      <label id="race-wrapper" class="hidden">Race
+        <select id="race-select">
+          <option value="Black">Black</option>
+          <option value="White">White</option>
+          <option value="Hispanic">Hispanic</option>
+        </select>
+      </label>
+
+      <!-- age selector -->
+      <label id="age-wrapper" class="hidden">Age Group
+        <select id="age-select">
+          <option value="25-35">25–35</option>
+          <option value="35-65">35–65</option>
+          <option value="65plus">65+</option>
+        </select>
+      </label>
+
+      <!-- education selector -->
+      <label id="educ-wrapper" class="hidden">Education
+        <select id="educ-select">
+          <option value="NoCollege">No College</option>
+          <option value="SomeCollege">Some College</option>
+          <option value="Bachelor's">Bachelor's</option>
+          <option value="Post-Bachelor's">Post-Bachelor's</option>
+        </select>
+      </label>
+
+      <!-- industry selector -->
+      <label id="industry-wrapper" class="hidden">Industry (1-digit NAICS)
+        <select id="industry-input">
+          <option value="1">Agriculture, Mining, Utilities</option>
+          <option value="2">Construction</option>
+          <option value="3">Manufacturing</option>
+          <option value="4">Trade & Retail</option>
+          <option value="5">Transportation & Warehousing</option>
+          <option value="6">IT, Finance, Real Estate</option>
+          <option value="7">Professional & Admin Services</option>
+          <option value="8">Education & Health Services</option>
+          <option value="9">Other Services & Public Admin</option>
+        </select>
+      </label>
+
+
+      <!-- Year selector-->
+      <label id="yeartwo-wrapper" class="hidden">Year
+        <select id="yeartwo-select">
+        <option value="2017">2017</option>
+        <option value="2016">2016</option>
+        <option value="2015">2015</option>
+        <option value="2014">2014</option>
+        <option value="2013">2013</option>
+        <option value="2012">2012</option>
+        <option value="2011">2011</option>
+        <option value="2010">2010</option>
+        <option value="2009">2009</option>
+        <option value="2008">2008</option>
+        <option value="2007">2007</option>
+        <option value="2006">2006</option>
+        <option value="2005">2005</option>
+        <option value="2004">2004</option>
+        <option value="2003">2003</option>
+        <option value="2002">2002</option>
+        <option value="2001">2001</option>
+        <option value="2000">2000</option>
+        <option value="1999">1999</option>
+        <option value="1998">1998</option>
+        <option value="1997">1997</option>
+        <option value="1996">1996</option>
+        <option value="1995">1995</option>
+        <option value="1994">1994</option>
+        <option value="1993">1993</option>
+        <option value="1992">1992</option>
+        <option value="1991">1991</option>
+        <option value="1990">1990</option>
+      </select>
+    </label>
+    </div>
+    
+    <h2>Download</h2>
+    <button id="download">Download Current Layer</button>
+  </div>
+
+  <h2>Neighborhood data are from Data Axel. County data and yearly metro date are from the IRS. And other metro data is from the ACS</h2>
+
+ <div class="legend" id="legend">
+  <strong>Page Rank Percentile</strong>
+  <div class="color-bar">
+    <div class="stop">
+      <div class="color" style="background:#f46d43"></div>
+      <span>50%</span>
+    </div>
+    <div class="stop">
+      <div class="color" style="background:#fdae61"></div>
+      <span>75%</span>
+    </div>
+    <div class="stop">
+      <div class="color" style="background:#fee08b"></div>
+      <span>80%</span>
+    </div>
+    <div class="stop">
+      <div class="color" style="background:#d9ef8b"></div>
+      <span>90%</span>
+    </div>
+    <div class="stop">
+      <div class="color" style="background:#a6d96a"></div>
+      <span>95%</span>
+    </div>
+    <div class="stop">
+      <div class="color" style="background:#66bd63"></div>
+      <span>99%</span>
+    </div>
+    <div class="stop">
+      <div class="color" style="background:#1a9850"></div>
+      <span>100%</span>
+    </div>
+  </div>
+</div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  // Get references to all option blocks
+  const neighborhoodOptions = document.getElementById('neighborhood-options');
+  const countyOptions = document.getElementById('county-options');
+  const metroOptions  = document.getElementById('metro-options');
+
+  // Function to toggle visibility
+  function updateOptionVisibility(selected) {
+    neighborhoodOptions.classList.add('hidden');
+    countyOptions.classList.add('hidden');
+    metroOptions.classList.add('hidden');
+
+    if (selected === 'neighborhood') {
+      neighborhoodOptions.classList.remove('hidden');
+    } else if (selected === 'county') {
+      countyOptions.classList.remove('hidden');
+    } else if (selected === 'metro') {
+      metroOptions.classList.remove('hidden');
+    }
+  }
+
+  // Attach event listeners to radio buttons
+  document.querySelectorAll('input[name="geography"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (radio.checked) {
+        updateOptionVisibility(radio.value);
+      }
+    });
+  });
+
+  // Run once on page load to initialize correct section
+  const initialSelection = document.querySelector('input[name="geography"]:checked').value;
+  updateOptionVisibility(initialSelection);
+</script>
+
+
+  <script src="script.js"></script>
+</body>
+</html>
