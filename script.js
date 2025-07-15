@@ -79,16 +79,16 @@ function loadLayer(column, geography) {
   if (geography === "county") {
     const key = "county_irs";  // Hardcode to IRS since no Source-select exists
 
-    url = "/test321/" + FILES[key];
+    url = "/geopagerank/" + FILES[key];
 
     labelField = "NAMELSAD";
   } else if (geography === "neighborhood"){
       
     const city = document.getElementById("city-select").value;
     if (city === "Chicago") {
-      url = "/test321/" + FILES.axel_Chicago;
+      url = "/geopagerank/" + FILES.axel_Chicago;
     } else if (city === "Boston") {
-      url = "/test321/" + FILES.axel_Boston;
+      url = "/geopagerank/" + FILES.axel_Boston;
     } else {
       console.error("Unknown city:", city);
       return;
@@ -99,7 +99,7 @@ function loadLayer(column, geography) {
       
   } else {
     const type = document.getElementById("filter-type-select").value;
-    url = "/test321/" + ((type === "year" || type === "none") ? FILES.metro_irs : FILES.metro_acs);
+    url = "/geopagerank/" + ((type === "year" || type === "none") ? FILES.metro_irs : FILES.metro_acs);
     labelField = "NAME";
   }
 
