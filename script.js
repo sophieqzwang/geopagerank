@@ -37,8 +37,16 @@ const LABEL_MAP = {
   "age_35_65": "Age 35–65",
   "age_65plus": "Age 65+",
   "educ_NoCollege": "No College",
-  "educ_WithCollege": "With College"
+  "educ_SomeCollege": "Some College",
+  "educ_BA": "Bachelor's",
+  "educ_Grad": "Post-Bachelor's"
 };
+
+function setSourceLabel(src) {
+  const el = document.getElementById("source-text");
+  if (el) el.textContent = src;
+}
+
 
 function getSelectedColumn() {
   const type = document.getElementById("filter-type-select")?.value;
@@ -74,34 +82,35 @@ function getSelectedColumn() {
 }
 
 function loadLayer(column, geography) {
-  let url, labelField;
+  let url, labelField, sourceName;   // ← include sourceName here
 
+  /* ───────── 1. COUNTY (always IRS) ───────── */
   if (geography === "county") {
-    const key = "county_irs";  // Hardcode to IRS since no Source-select exists
-
-    url = "/geopagerank/" + FILES[key];
-
+    url        = "/geopagerank/" + FILES.county_irs;
     labelField = "NAMELSAD";
-  } else if (geography === "neighborhood"){
-      
+    sourceName = "IRS county-level migration counts, 1991-2021";
+
+  /* ───────── 2. NEIGHBORHOOD (Data Axel) ───────── */
+  } else if (geography === "neighborhood") {
     const city = document.getElementById("city-select").value;
-    if (city === "Chicago") {
-      url = "/geopagerank/" + FILES.axel_Chicago;
-    } else if (city === "Boston") {
-      url = "/geopagerank/" + FILES.axel_Boston;
-    } else {
-      console.error("Unknown city:", city);
-      return;
-    }
+    url        = "/geopagerank/" + (city === "Chicago"
+                                   ? FILES.axel_Chicago
+                                   : FILES.axel_Boston);
+    labelField = "district_id";
+    sourceName = "DataAxel neighborhood migration data, 2019-2023";
 
-  labelField = "district_id"; // or use another property for popup labeling if needed
-
-      
+  /* ───────── 3. METRO (IRS only for “Year” sample) ───────── */
   } else {
-    const type = document.getElementById("filter-type-select").value;
-    url = "/geopagerank/" + ((type === "year" || type === "none") ? FILES.metro_irs : FILES.metro_acs);
-    labelField = "NAME";
+    const type  = document.getElementById("filter-type-select").value;
+    const isIRS = (type === "year");          // IRS when user picks “Year”
+    url         = "/geopagerank/" + (isIRS ? FILES.metro_irs
+                                           : FILES.metro_acs);
+    labelField  = "NAME";
+    sourceName  = isIRS ? "IRS migration counts, 1991-2021, aggregated to the metro level" : "ACS microdata, 2018-2023";
   }
+
+  /* ─── update the sidebar *before* loading the layer ─── */
+  setSourceLabel(sourceName);
 
   fetch(url)
     .then(res => res.json())
