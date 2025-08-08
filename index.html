@@ -38,17 +38,6 @@
     <label class="toggle-label"><input type="radio" name="geography" value="neighborhood" /> <span>Neighborhood</span></label><br />   
 
 
-
-    <!-- Neighborhood level controls-->
-    <div id="neighborhood-options">
-      <h2>Choose city</h2>
-      <select id="city-select" name="city">
-        <option value="Chicago" selected>Chicago</option>
-        <option value="Boston">Boston</option>        
-      </select>
-    </div>
-
-
     <!-- County-level controls -->
     <div id="county-options">
       <h2>Choose year</h2>
@@ -89,66 +78,104 @@
     </div>
 
     <!-- Metro-level controls -->
-    <div id="metro-options" class="hidden">
-      <h2>Choose sample</h2>
-      <label>Filter by
-        <select id="filter-type-select">
-          <option value="total" selected>All moves</option>
-          <option value="race">Race</option>
-          <option value="age">Age Group</option>
-          <option value="education">Education</option>
-          <option value="industry">Industry (1-digit NAICS)</option>
-          <option value="year">Year</option>
-        </select>
-      </label>
+<!-- Metro-level controls -->
+<div id="metro-options" class="hidden">
+  <h2>Choose sample</h2>
 
-      <!-- race selector -->
-      <label id="race-wrapper" class="hidden">Race
-        <select id="race-select">
-          <option value="Black">Black</option>
-          <option value="White">White</option>
-          <option value="Hispanic">Hispanic</option>
-        </select>
-      </label>
-
-      <!-- age selector -->
-      <label id="age-wrapper" class="hidden">Age Group
-        <select id="age-select">
-          <option value="25-35">25–35</option>
-          <option value="35-65">35–65</option>
-          <option value="65plus">65+</option>
-        </select>
-      </label>
-
-      <!-- education selector -->
-      <label id="educ-wrapper" class="hidden">Education
-        <select id="educ-select">
-          <option value="NoCollege">No College</option>
-          <option value="SomeCollege">Some College</option>
-          <option value="BA">Bachelor's</option>
-          <option value="Grad">Post-Bachelor's</option>
-        </select>
-      </label>
-
-      <!-- industry selector -->
-      <label id="industry-wrapper" class="hidden">Industry (1-digit NAICS)
-        <select id="industry-input">
-          <option value="1">Agriculture, Mining, Utilities</option>
-          <option value="2">Construction</option>
-          <option value="3">Manufacturing</option>
-          <option value="4">Trade & Retail</option>
-          <option value="5">Transportation & Warehousing</option>
-          <option value="6">IT, Finance, Real Estate</option>
-          <option value="7">Professional & Admin Services</option>
-          <option value="8">Education & Health Services</option>
-          <option value="9">Other Services & Public Admin</option>
-        </select>
-      </label>
+  <!-- ACS vs IRS toggle -->
+  <h3>Data Source</h3>
+  <div style="margin-bottom: 0.5rem;">
+    <label class="toggle-label"><input type="radio" name="metro-source" value="acs" checked /> <span>ACS</span></label><br />
+    <label class="toggle-label"><input type="radio" name="metro-source" value="irs" /> <span>IRS</span></label>
+  </div>
 
 
-      <!-- Year selector-->
-      <label id="yeartwo-wrapper" class="hidden">Year
-        <select id="yeartwo-select">
+  <!-- ACS Filters -->
+  <div id="acs-filter-options">
+    <label>Filter by
+      <select id="filter-type-select">
+        <option value="total" selected>All moves</option>
+        <option value="race">Race</option>
+        <option value="age">Age Group</option>
+        <option value="education">Education</option>
+        <option value="industry">Industry (1-digit NAICS)</option>
+        <option value="children">Children</option>
+        <option value="tenure">Housing Tenure</option>
+        <option value="workstatus">Work Status</option>
+      </select>
+    </label>
+
+  <!-- ACS Year selector -->
+  <label id="acs-year-wrapper">Year
+    <select id="acs-year-select">
+      <option value="2019">2019-2023</option>
+      <option value="2018">2018-2022</option>
+      <option value="2017">2017-2021</option>
+      <option value="2016">2016-2020</option>
+      <option value="2015">2015-2019</option>
+      <option value="2014">2014-2018</option>
+      <option value="2013">2013-2017</option>
+      <option value="2012">2012-2016</option>
+      <option value="2011">2011-2015</option>
+      <option value="2010">2010-2014</option> 
+      <option value="2009">2009-2013</option>   
+      <option value="2008">2008-2012</option>
+      <option value="2007">2007-2011</option>
+      <option value="2006">2006-2010</option>      
+      <option value="2005">2005-2009</option>      
+    </select>
+  </label>
+
+
+    <!-- race selector -->
+    <label id="race-wrapper" class="hidden">Race
+      <select id="race-select">
+        <option value="Black">Black</option>
+        <option value="White">White</option>
+        <option value="Hispanic">Hispanic</option>
+      </select>
+    </label>
+
+    <!-- age selector -->
+    <label id="age-wrapper" class="hidden">Age Group
+      <select id="age-select">
+        <option value="25-35">25–35</option>
+        <option value="35-65">35–65</option>
+        <option value="65plus">65+</option>
+      </select>
+    </label>
+
+    <!-- education selector -->
+    <label id="educ-wrapper" class="hidden">Education
+      <select id="educ-select">
+        <option value="NoCollege">No College</option>
+        <option value="SomeCollege">Some College</option>
+        <option value="BA">Bachelor's</option>
+        <option value="Grad">Post-Bachelor's</option>
+      </select>
+    </label>
+
+    <!-- industry selector -->
+    <label id="industry-wrapper" class="hidden">Industry (1-digit NAICS)
+      <select id="industry-input">
+        <option value="1">Agriculture, Mining, Utilities</option>
+        <option value="2">Construction</option>
+        <option value="3">Manufacturing</option>
+        <option value="4">Trade & Retail</option>
+        <option value="5">Transportation & Warehousing</option>
+        <option value="6">IT, Finance, Real Estate</option>
+        <option value="7">Professional & Admin Services</option>
+        <option value="8">Education & Health Services</option>
+        <option value="9">Other Services & Public Admin</option>
+        <option value="X">Not in labor force</option>
+      </select>
+    </label>
+  </div>
+
+  <!-- IRS year selector (only shown when IRS is selected) -->
+  <div id="irs-year-wrapper" class="hidden">
+    <label>Year
+      <select id="yeartwo-select">
         <option value="2021">2021</option>
         <option value="2020">2020</option>
         <option value="2019">2019</option>
@@ -183,7 +210,37 @@
         <option value="1990">1990</option>
       </select>
     </label>
-    </div>
+  </div>
+  
+      <!-- children selector -->
+    <label id="children-wrapper" class="hidden">Children
+      <select id="children-select">
+        <option value="no_kids">No Children</option>
+        <option value="with_kids">With Any Children</option>
+        <option value="kids_u18">With Children Under 18</option>
+      </select>
+    </label>
+  
+        <!-- tenure selector -->
+    <label id="tenure-wrapper" class="hidden">Housing Tenure
+      <select id="tenure-select">
+        <option value="Owner">Owner</option>
+        <option value="Renter">Renter</option>
+        <option value="NA">Unknown</option>
+      </select>
+    </label>
+  
+        <!-- workstatus selector -->
+    <label id="workstatus-wrapper" class="hidden">Work Status
+      <select id="workstatus-select">
+        <option value="head50_no_work">Retired</option>
+        <option value="someone_working">Working</option>
+      </select>
+    </label>
+  
+</div>
+
+
     
     <h2>Download</h2>
 <!-- Button -->
@@ -249,19 +306,16 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
   // Get references to all option blocks
-  const neighborhoodOptions = document.getElementById('neighborhood-options');
+
   const countyOptions = document.getElementById('county-options');
   const metroOptions  = document.getElementById('metro-options');
 
   // Function to toggle visibility
   function updateOptionVisibility(selected) {
-    neighborhoodOptions.classList.add('hidden');
     countyOptions.classList.add('hidden');
     metroOptions.classList.add('hidden');
 
-    if (selected === 'neighborhood') {
-      neighborhoodOptions.classList.remove('hidden');
-    } else if (selected === 'county') {
+    if (selected === 'county') {
       countyOptions.classList.remove('hidden');
     } else if (selected === 'metro') {
       metroOptions.classList.remove('hidden');

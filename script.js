@@ -1,14 +1,12 @@
-
 // script.js - Updated for combined ACS and IRS PageRank data
 
 // create map *without* its default zoom buttons
 let map = L.map("map", {
   center: [37.8, -96],
   zoom:   4,
-  zoomControl: false        // turn off default (topleft) control
+  zoomControl: false
 });
 
-// add the zoom buttons back on the right
 L.control.zoom({ position: "topright" }).addTo(map);
 
 let geoLayer;
@@ -19,13 +17,13 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 const FILES = {
   county_irs: "data/irs_county_pagerank_combined.geojson",
-  axel_Chicago: "data/axel_Chicago.geojson",
-  axel_Boston: "data/axel_Boston.geojson",  
+  axel_national: "data/axel_national.geojson",
   metro_irs: "data/irs_pagerank_combined.geojson",
-  metro_acs: "data/acs_pagerank_combined.geojson"
+  acs_rolling5: "data/acs_rolling5_pagerank.geojson" 
 };
 
-let maxRank = 100;  // default, will be updated per dataset
+
+let maxRank = 100;
 
 const LABEL_MAP = {
   "total_flowHH": "Total Household Flow",
@@ -47,69 +45,91 @@ function setSourceLabel(src) {
   if (el) el.textContent = src;
 }
 
-
 function getSelectedColumn() {
   const type = document.getElementById("filter-type-select")?.value;
   const geography = document.querySelector('input[name="geography"]:checked')?.value;
-  
+  const acsYear = document.getElementById("acs-year-select")?.value;
+
   if (geography === "neighborhood") {
     return `rank`;
   }
+
   if (geography === "county") {
     const val = document.getElementById("year-select").value;
     return `irs_county_rank_${val}`;
   }
-  if (geography !== "county" && type === "year") {
-    const val = document.getElementById("yeartwo-select").value;
-    return `irs_metro_rank_${val}`;
-  }
-  if (type === "race") {
-    return `rank_race_${document.getElementById("race-select").value}`;
-  }
-  if (type === "age") {
-    const val = document.getElementById("age-select").value;
-    return `rank_age_${val.replace("+", "plus").replace("-", "_")}`;
-  }
-  if (type === "education") {
-    return `rank_educ_${document.getElementById("educ-select").value}`;
-  }
-  if (type === "industry") {
-    const code = document.getElementById("industry-input").value;
-    return `rank_industry_${code}`;
+
+  if (geography === "metro") {
+    const source = document.querySelector('input[name="metro-source"]:checked')?.value;
+    const isACS = (source === "acs");
+    const hasYear = isACS && acsYear && acsYear !== "All";
+    const suffix = hasYear ? `_${acsYear}` : "";
+
+    if (source === "irs") {
+      const val = document.getElementById("yeartwo-select").value;
+      return `irs_metro_rank_${val}`;
+    }
+
+    if (type === "race") {
+      return `rank_race_${document.getElementById("race-select").value}${suffix}`;
+    }
+    if (type === "age") {
+      const val = document.getElementById("age-select").value;
+      return `rank_age_${val.replace("+", "plus").replace("-", "_")}${suffix}`;
+    }
+    if (type === "education") {
+      return `rank_educ_${document.getElementById("educ-select").value}${suffix}`;
+    }
+    if (type === "industry") {
+      const code = document.getElementById("industry-input").value;
+      return `rank_industry_${code}${suffix}`;
+    }
+    if (type === "children") {
+      return `rank_kids_flow_${document.getElementById("children-select").value}${suffix}`;
+    }
+    if (type === "workstatus") {
+      return `rank_retired_flow_${document.getElementById("workstatus-select").value}${suffix}`;
+    }
+    if (type === "tenure") {
+      return `rank_tenure_${document.getElementById("tenure-select").value}${suffix}`;
+    }
+    
+    return `rank_total_flowPER${suffix}`;
   }
 
-  return "rank_total_flowPER"; // fallback
+  // fallback
+  return "rank_total_flowPER";
 }
 
-function loadLayer(column, geography) {
-  let url, labelField, sourceName;   // ← include sourceName here
 
-  /* ───────── 1. COUNTY (always IRS) ───────── */
+function loadLayer(column, geography) {
+  let url, labelField, sourceName;
+
   if (geography === "county") {
-    url        = "/geopagerank/" + FILES.county_irs;
+    url        = FILES.county_irs;
     labelField = "NAMELSAD";
     sourceName = "IRS county-level migration counts, 1991-2022";
-
-  /* ───────── 2. NEIGHBORHOOD (Data Axel) ───────── */
   } else if (geography === "neighborhood") {
-    const city = document.getElementById("city-select").value;
-    url        = "/geopagerank/" + (city === "Chicago"
-                                   ? FILES.axel_Chicago
-                                   : FILES.axel_Boston);
-    labelField = "district_id";
-    sourceName = "DataAxel neighborhood migration data, 2019-2023";
-
-  /* ───────── 3. METRO (IRS only for “Year” sample) ───────── */
+  url = FILES.axel_national;
+  labelField = "district_id";  // or "name" if you added a label column
+  sourceName = "DataAxel neighborhood migration data, 2019–2023 (National)";
   } else {
-    const type  = document.getElementById("filter-type-select").value;
-    const isIRS = (type === "year");          // IRS when user picks “Year”
-    url         = "/geopagerank/" + (isIRS ? FILES.metro_irs
-                                           : FILES.metro_acs);
-    labelField  = "NAME";
-    sourceName  = isIRS ? "IRS migration counts, 1991-2022, aggregated to the metro level" : "ACS microdata, 2018-2023";
+    const source = document.querySelector('input[name="metro-source"]:checked')?.value;
+    const acsYear = document.getElementById("acs-year-select")?.value;
+    const useRolling = source === "acs" && acsYear && acsYear !== "All";
+  
+    if (source === "irs") {
+      url = FILES.metro_irs;
+      sourceName = "IRS migration counts, 1991-2022, aggregated to the metro level";
+    } else {
+      url = FILES.acs_rolling5;
+      sourceName = `ACS microdata, 2005-2023`;
+    } 
+  
+    labelField = "NAME";
   }
 
-  /* ─── update the sidebar *before* loading the layer ─── */
+
   setSourceLabel(sourceName);
 
   fetch(url)
@@ -136,7 +156,6 @@ function loadLayer(column, geography) {
           dashArray: '3',
           fillOpacity: 0.8
         }),
-        // --- inside loadLayer(...) -----------------------------------------------
         onEachFeature: (feature, layer) => {
           const name = feature.properties[labelField] || "Unnamed";
           const val  = feature.properties[column];
@@ -144,12 +163,8 @@ function loadLayer(column, geography) {
             ? `Rank: ${val} / ${maxRank}`
             : "Rank: N/A";
           layer.bindPopup(`<strong>${name}</strong><br>${rankText}`);
-
         }
-
-
       }).addTo(map);
-
     })
     .catch(err => {
       console.error("Failed to load GeoJSON:", err);
@@ -159,7 +174,6 @@ function loadLayer(column, geography) {
 function getColor(d) {
   if (d == null || isNaN(d) || !maxRank) return "#ccc";
 
-  // Compute percentile: lower rank = better
   const p = 1 - (d - 1) / (maxRank - 1);
 
   if (p <= 0.50) return "#f46d43";
@@ -168,10 +182,8 @@ function getColor(d) {
   if (p <= 0.90) return "#d9ef8b";
   if (p <= 0.95) return "#a6d96a";
   if (p <= 0.99) return "#66bd63";
-  return "#1a9850";  // top ~1%
+  return "#1a9850";
 }
-
-
 
 function refreshMap() {
   const geography = document.querySelector('input[name="geography"]:checked')?.value;
@@ -189,115 +201,103 @@ function updateFilterVisibility() {
     age: document.getElementById("age-wrapper"),
     education: document.getElementById("educ-wrapper"),
     industry: document.getElementById("industry-wrapper"),
+    children: document.getElementById("children-wrapper"),
+    tenure: document.getElementById("tenure-wrapper"),
+    workstatus: document.getElementById("workstatus-wrapper"),
     year: document.getElementById("yeartwo-wrapper")
   };
+
   Object.keys(wrappers).forEach(key => {
     if (wrappers[key]) {
       wrappers[key].classList.toggle("hidden", key !== val);
     }
   });
+
+  const metroSource = document.querySelector('input[name="metro-source"]:checked')?.value;
+  document.getElementById("acs-filter-options")?.classList.toggle("hidden", metroSource !== "acs");
+  document.getElementById("irs-year-wrapper")?.classList.toggle("hidden", metroSource !== "irs");
 }
 
 function setupEventListeners() {
-  // -- Geography radio buttons (Neighborhood / County / Metro)
   document.querySelectorAll('input[name="geography"]').forEach(radio => {
     radio.addEventListener("change", () => {
       updateFilterVisibility();
-      refreshMap();               // redraw as soon as geography changes
+      refreshMap();
     });
   });
 
-  // -- Metro “Filter by” dropdown (total / race / age / … / year)
   document.getElementById("filter-type-select").addEventListener("change", () => {
     updateFilterVisibility();
-    refreshMap();                 // redraw as soon as filter type changes
+    refreshMap();
   });
 
-  // -- All subtype selectors that can change the column we need
-  //      • added "year-select" so County-year changes fire refreshMap()
-  ["race-select", "age-select", "educ-select", "year-select", "yeartwo-select"].forEach(id => {
+    [
+    "race-select",
+    "age-select",
+    "educ-select",
+    "year-select",
+    "yeartwo-select",
+    "acs-year-select",
+    "children-select",
+    "tenure-select",
+    "workstatus-select"
+  ].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener("change", refreshMap);
   });
 
-  // -- Industry dropdown (1-digit NAICS)
+
   const ind = document.getElementById("industry-input");
   if (ind) ind.addEventListener("change", refreshMap);
 
-// --- Download-button handler (new) ------------------------------------
-const download = document.getElementById("download");
-if (download) {
-  download.addEventListener("click", () => {
-    const geography = document.querySelector('input[name="geography"]:checked')?.value;
-    let   path      = null;
-
-    if (geography === "neighborhood") {
-      const city = document.getElementById("city-select").value;
-      path = (city === "Chicago") ? FILES.axel_Chicago
-           : (city === "Boston")  ? FILES.axel_Boston
-           : null;
-    } else if (geography === "county") {
-      path = FILES.county_irs;
-    } else {                         // metro
-      const type = document.getElementById("filter-type-select").value;
-      path = (type === "year" || type === "none")
-           ? FILES.metro_irs        // IRS metro file for total or year
-           : FILES.metro_acs;       // ACS metro file for race/age/educ/industry
-    }
-
-    if (!path) {                     // defensive guard
-      console.error("Could not determine CSV to download.");
-      return;
-    }
-
-    const csvPath  = path.replace(".geojson", ".csv");
-    const anchor   = document.createElement("a");
-    anchor.href    = csvPath;
-    anchor.download = csvPath.split("/").pop();  // just the file name
-    anchor.click();
-  });
-}
-
-}
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  setupEventListeners();
-  updateFilterVisibility();
-  refreshMap();
-
-  const cityBounds = {
-    Chicago: [[41.20, -88.40], [42.40, -87.00]],  // zoomed out more
-    Boston:  [[41.80, -71.70], [42.70, -70.60]]   // zoomed out more
-  };
-
-
-  const citySelect = document.getElementById("city-select");
-  const geographyRadios = document.querySelectorAll('input[name="geography"]');
-
-  // Recenter when city is changed
-  if (citySelect) {
-    citySelect.addEventListener("change", () => {
-      const city = citySelect.value;
-      if (cityBounds[city]) {
-        map.fitBounds(cityBounds[city]);
-      }
+  document.querySelectorAll('input[name="metro-source"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      updateFilterVisibility();
       refreshMap();
     });
-  }
-
-  // Recenter when "Neighborhood" geography is selected
-  geographyRadios.forEach(radio => {
-    radio.addEventListener("change", () => {
-      if (radio.checked && radio.value === "neighborhood") {
-        const city = citySelect?.value;
-        if (cityBounds[city]) {
-          map.fitBounds(cityBounds[city]);
-        }
-      }
-    });
   });
+
+  const download = document.getElementById("download");
+    if (download) {
+    download.addEventListener("click", () => {
+      const geography = document.querySelector('input[name="geography"]:checked')?.value;
+      let path = null;
+
+      if (geography === "neighborhood") {
+        path = FILES.axel_national;
+      } else if (geography === "county") {
+        path = FILES.county_irs;
+      } else {
+        const source = document.querySelector('input[name="metro-source"]:checked')?.value;
+        const acsYear = document.getElementById("acs-year-select")?.value;
+        const useRolling = source === "acs" && acsYear && acsYear !== "All";
+        path = (source === "irs")
+          ? FILES.metro_irs
+          : FILES.acs_rolling5;
+      }
+
+      if (!path) {
+        console.error("Could not determine CSV to download.");
+        return;
+      }
+
+      const csvPath = path.replace(".geojson", ".csv");
+      const anchor = document.createElement("a");
+      anchor.href = csvPath;
+      anchor.download = csvPath.split("/").pop();
+      anchor.click();
+    });
+  } 
+}
+
+// Moved back outside the download block
+document.addEventListener("DOMContentLoaded", () => {
+  setupEventListeners();     // wire up your “geography” & “filter” controls
+  updateFilterVisibility();  // show the right controls for the default radio
+  refreshMap();              // draw that first layer
 });
+
+
 
 
 
