@@ -26,20 +26,20 @@
   <div id="header">
     <h1 class="title">Geographic Pagerank</h1>
         <h2 class="subtitle">
-          <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5270927" target="_blank">From Alex Bell, Sophie Calder-Wang, and Shusheng Zhong (2025)</a>
+          <a href="https://www.nber.org/papers/w35294" target="_blank">From Alex Bell, Sophie Calder-Wang, and Shusheng Zhong (2026)</a>
         </h2>
   </div>
 
   <div id="sidebar">
     <!-- Geography selector -->
     <h2>Geography</h2>
-    <label class="toggle-label"><input type="radio" name="geography" value="metro" /> <span>Metro</span></label><br />
-    <label class="toggle-label"><input type="radio" name="geography" value="county" checked /> <span>County</span></label><br />
+    <label class="toggle-label"><input type="radio" name="geography" value="metro" checked /> <span>Metro</span></label><br />
+    <label class="toggle-label"><input type="radio" name="geography" value="county" /> <span>County</span></label><br />
     <!--<label class="toggle-label"><input type="radio" name="geography" value="neighborhood" /> <span>Neighborhood</span></label><br />-->
 
 
     <!-- County-level controls -->
-    <div id="county-options">
+    <div id="county-options" class ="hidden">
       <h2>Choose year</h2>
       <select id="year-select" name="year">
       <option value="2021" selected>2021</option>
@@ -79,14 +79,14 @@
 
     <!-- Metro-level controls -->
 <!-- Metro-level controls -->
-<div id="metro-options" class="hidden">
+<div id="metro-options">
   <h2>Choose sample</h2>
 
   <!-- ACS vs IRS toggle -->
   <h3>Data Source</h3>
   <div style="margin-bottom: 0.5rem;">
-    <label class="toggle-label"><input type="radio" name="metro-source" value="acs" checked /> <span>ACS</span></label><br />
-    <label class="toggle-label"><input type="radio" name="metro-source" value="irs" /> <span>IRS</span></label>
+    <label class="toggle-label"><input type="radio" name="metro-source" value="acs" /> <span>ACS</span></label><br />
+    <label class="toggle-label"><input type="radio" name="metro-source" value="irs" checked /> <span>IRS</span></label>
   </div>
 
 
@@ -255,7 +255,7 @@
   letter-spacing: normal;
   margin-top: 0.75em;
 ">
-  Data source: <span id="source-text">IRS county-level migration counts, 1991–2022</span>
+  Data source: <span id="source-text">IRS migration counts, 1991–2022, aggregated to the metro level</span>
 </div>
 
 

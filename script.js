@@ -16,10 +16,10 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 const FILES = {
-  county_irs: "data/irs_county_pagerank_combined.geojson",
+  county_irs: "data/irs_county_pagerank.geojson",
   axel_national: "data/axel_national.geojson",
-  metro_irs: "data/irs_pagerank_combined.geojson",
-  acs_rolling5: "data/acs_rolling5_pagerank.geojson" 
+  metro_irs: "data/irs_cbsa_pagerank.geojson",
+  acs_cbsa_rolling5: "data/acs_cbsa_rolling5_pagerank.geojson" 
 };
 
 
@@ -122,7 +122,7 @@ function loadLayer(column, geography) {
       url = FILES.metro_irs;
       sourceName = "IRS migration counts, 1991-2022, aggregated to the metro level";
     } else {
-      url = FILES.acs_rolling5;
+      url = FILES.acs_cbsa_rolling5;
       sourceName = `ACS microdata, 2005-2023`;
     } 
   
@@ -273,7 +273,7 @@ function setupEventListeners() {
         const useRolling = source === "acs" && acsYear && acsYear !== "All";
         path = (source === "irs")
           ? FILES.metro_irs
-          : FILES.acs_rolling5;
+          : FILES.acs_cbsa_rolling5;
       }
 
       if (!path) {
