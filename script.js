@@ -16,10 +16,10 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 const FILES = {
-  county_irs: "data/irs_county_pagerank.geojson",
-  axel_national: "data/axel_national.geojson",
-  metro_irs: "data/irs_cbsa_pagerank.geojson",
-  acs_cbsa_rolling5: "data/acs_cbsa_rolling5_pagerank.geojson" 
+  county_irs: "website_data/irs_county_pagerank.geojson",
+  axel_national: "website_data/axel_national.geojson",
+  metro_irs: "website_data/irs_cbsa_pagerank.geojson",
+  acs_cbsa_rolling5: "website_data/acs_cbsa_rolling5_pagerank.geojson" 
 };
 
 
